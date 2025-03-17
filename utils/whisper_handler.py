@@ -1,14 +1,33 @@
+import os
 import whisper
 import torch
 from typing import Optional, Tuple, Dict
 from whisper.tokenizer import LANGUAGES
 from whisper.utils import format_timestamp
+import sys
 
 class WhisperHandler:
     def __init__(self):
         self.model = None
         self.model_name = None
         self.last_result = None
+        self.set_ffmpeg_path()  # Set the FFmpeg path when initializing
+
+    def set_ffmpeg_path(self):
+        """Set the path for the bundled FFmpeg binary."""
+        if getattr(sys, 'frozen', False):
+            # Running as a bundled executable
+            if sys.platform.startswith('win'):
+                ffmpeg_path = os.path.join(sys._MEIPASS, 'ffmpeg.exe')
+            else:
+                ffmpeg_path = os.path.join(sys._MEIPASS, 'ffmpeg')
+            
+            os.environ["FFMPEG_BINARY"] = ffmpeg_path
+            # Add the FFmpeg path to the system PATH
+            os.environ["PATH"] = f"{os.path.dirname(ffmpeg_path)};{os.environ['PATH']}" if sys.platform.startswith('win') else f"{os.path.dirname(ffmpeg_path)}:{os.environ['PATH']}"
+        else:
+            # Running in a normal Python environment
+            os.environ["FFMPEG_BINARY"] = 'ffmpeg'  # Assume it's in the PATH
 
     def load_model(self, model_name: str) -> None:
         """Load a Whisper model."""
