@@ -1,3 +1,6 @@
 .DS_Store
 oratiotext-venv/
 soundfiles/
+build/
+dist/
+bin/

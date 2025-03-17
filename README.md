@@ -1,6 +1,7 @@
 # OratioText
 
-A cross-platform desktop application for converting speech to text using OpenAI's Whisper model. This application only **runs on your computer** and uses the AI model **locally**.
+| <img src="assets/appicon.png" alt="OratioText Icon" width="200" height="auto"> | A cross-platform desktop application for converting speech to text using OpenAI's [Whisper](https://github.com/openai/whisper) model. This application only <ins>**runs on your computer**</ins> and uses the AI model <ins>locally</ins>. |
+| :-------------------: | :----------: |
 
 ## Features
 
@@ -8,7 +9,7 @@ A cross-platform desktop application for converting speech to text using OpenAI'
     - AUDIO: *.mp3, *.wav, *.m4a, *.flac, *.ogg
     - VIDEO: *.mp4, *.avi, *.mov, *.wmv
 - Automatic model recommendation based on system specifications
-- Multiple Whisper model options
+- Multiple Whisper model options; tiny, base, small, medium, large
 - Easy-to-use graphical interface
 - Export transcription results
 
@@ -50,16 +51,36 @@ pip install -r requirements.txt
 python -m main
 ```
 
+## Build
+
+This part is a bit tricky. To build this application, [`pyinstaller`](https://pyinstaller.org/en/stable/) is used. 
+
+1. Activate the virtual environment:
+```bash
+source oratiotext/bin/activate  
+# On Windows: venv\Scripts\activate
+```
+
+2. Install `pyinstaller`:
+```bash
+pip install pyinstaller
+```
+
+3. Run `pyinstaller` with the provided [.spec file](./OratioText.spec):
+```bash
+pyinstaller --clean OratioText.spec
+```
+
 ## TODO
 
 - [ ] Add a cancel button
 - [ ] Add a progress bar for the transcription
 - [ ] Add a progress bar for the download of the Whisper model (with cancel option)
 - [ ] Add a help menu
-- [ ] Add a about menu (feedback, donate, etc)
-- [ ] Add an icon
+- [ ] Add an about menu (feedback, donate, etc)
+- [x] Add an icon
 - [ ] Build an installer for Windows, MacOS and Linux
 
 --- 
 
-*MIT License*
+[*MIT License*](./LICENSE)
