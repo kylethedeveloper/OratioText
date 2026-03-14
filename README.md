@@ -38,7 +38,7 @@ cd OratioText
 ```bash
 python -m venv oratiotext
 source oratiotext/bin/activate  
-# On Windows: venv\Scripts\activate
+# On Windows: oratiotext\Scripts\activate
 ```
 
 3. Install the required dependencies:
@@ -53,23 +53,21 @@ python -m main
 
 ## Build
 
-This part is a bit tricky. To build this application, [`pyinstaller`](https://pyinstaller.org/en/stable/) is used. 
+This application is packaged using [`pyinstaller`](https://pyinstaller.org/en/stable/). See [BUILD.md](./BUILD.md) for detailed instructions.
 
-1. Activate the virtual environment:
+**Quick start:**
 ```bash
-source oratiotext/bin/activate  
-# On Windows: venv\Scripts\activate
-```
-
-2. Install `pyinstaller`:
-```bash
+# Install pyinstaller
 pip install pyinstaller
+
+# macOS
+pyinstaller --clean OratioText.spec
+
+# Windows
+pyinstaller --clean OratioText-windows.spec
 ```
 
-3. Run `pyinstaller` with the provided [.spec file](./OratioText.spec):
-```bash
-pyinstaller --clean OratioText.spec
-```
+> **Note:** FFmpeg must be installed and in your system PATH before building.
 
 ## TODO
 
@@ -79,7 +77,8 @@ pyinstaller --clean OratioText.spec
 - [ ] Add a help menu
 - [ ] Add an about menu (feedback, donate, etc)
 - [x] Add an icon
-- [ ] Build an installer for Windows, MacOS and Linux
+- [x] Build for Windows and macOS (see [BUILD.md](./BUILD.md))
+- [ ] Build for Linux
 
 --- 
 

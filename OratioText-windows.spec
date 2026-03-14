@@ -6,11 +6,11 @@ from PyInstaller.utils.hooks import collect_submodules, collect_data_files
 hiddenimports = ['components', 'utils']
 hiddenimports += collect_submodules('whisper')
 
-# Find ffmpeg from system PATH (installed via 'brew install ffmpeg')
+# Find ffmpeg from system PATH (installed via 'choco install ffmpeg' or manually)
 ffmpeg_path = shutil.which('ffmpeg')
 if ffmpeg_path is None:
     raise FileNotFoundError(
-        "ffmpeg not found in PATH. Install it with: brew install ffmpeg"
+        "ffmpeg.exe not found in PATH. Install it with: choco install ffmpeg"
     )
 
 a = Analysis(
@@ -54,11 +54,4 @@ coll = COLLECT(
     upx=True,
     upx_exclude=[],
     name='OratioText',
-)
-app = BUNDLE(
-    coll,
-    name='OratioText.app',
-    icon='assets/appicon.png',
-    bundle_identifier='com.oratiotext.app',
-    info_plist='Info.plist',
 )
