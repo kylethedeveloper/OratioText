@@ -15,10 +15,10 @@ jobs:
         include:
           - name: apple-silicon
             arch: arm64
-            runner: macos-14
+            runner: macos-15
           - name: intel
             arch: x86_64
-            runner: macos-13
+            runner: macos-15-intel
 
     runs-on: ${{ matrix.runner }}
     
@@ -47,7 +47,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install pyinstaller
+        pip install pyinstaller pillow
 
     - name: Build application
       run: |
@@ -92,7 +92,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install pyinstaller
+        pip install pyinstaller pillow
 
     - name: Build application
       run: |
