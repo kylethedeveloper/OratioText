@@ -15,10 +15,10 @@ jobs:
         include:
           - name: apple-silicon
             arch: arm64
-            runner: macos-15
+            runner: macos-26
           - name: intel
             arch: x86_64
-            runner: macos-15-intel
+            runner: macos-26-intel
 
     runs-on: ${{ matrix.runner }}
     

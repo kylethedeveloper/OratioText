@@ -3,7 +3,6 @@ oratiotext-venv/
 soundfiles/
 build/
 dist/
-dist2/
 scripts/sign_app.py
 bin/
 OratioText.code-workspace
