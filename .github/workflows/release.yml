@@ -1,13 +1,15 @@
-name: Build OratioText
+name: Release OratioText
 
 on:
   push:
-    branches: [ master, develop ]
-  pull_request:
-    branches: [ master ]
+    tags:
+      - 'v*'
 
 jobs:
-  build:
+  release:
+    permissions:
+      contents: write
+      
     strategy:
       fail-fast: false
       matrix:
@@ -51,19 +53,24 @@ jobs:
       with:
         workspaces: src-tauri
 
-    - name: Build Tauri app
+    - name: Evaluate pre-release status
+      id: prerelease
+      run: |
+        if [[ "${{ github.ref_name }}" == *"-rc"* || "${{ github.ref_name }}" == *"-beta"* || "${{ github.ref_name }}" == *"-alpha"* ]]; then
+          echo "is_prerelease=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "is_prerelease=false" >> "$GITHUB_OUTPUT"
+        fi
+      shell: bash
+
+    - name: Build and Publish Tauri app
       uses: tauri-apps/tauri-action@v0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         args: ${{ matrix.args }}
-
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: OratioText-${{ matrix.name }}
-        path: |
-          src-tauri/target/${{ matrix.target }}/release/bundle/**/*.dmg
-          src-tauri/target/${{ matrix.target }}/release/bundle/**/*.app
-          src-tauri/target/${{ matrix.target }}/release/bundle/**/*.msi
-          src-tauri/target/${{ matrix.target }}/release/bundle/**/*.exe
+        tagName: ${{ github.ref_name }}
+        releaseName: "OratioText ${{ github.ref_name }}"
+        releaseBody: "Download the attached assets to install OratioText."
+        releaseDraft: false
+        prerelease: ${{ steps.prerelease.outputs.is_prerelease == 'true' }}

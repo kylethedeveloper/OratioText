@@ -1,8 +1,10 @@
 - [x] Add a cancel button
 - [x] Add a progress bar for the transcription
 - [x] Add a progress bar for the download of the Whisper model (with cancel option)
-- [ ] Add a help menu
-- [ ] Add an about menu (feedback, donate, etc)
 - [x] Add an icon
 - [x] Build for Windows and macOS (see [BUILD.md](./BUILD.md))
+- [ ] Add a help menu
+- [ ] Add an about menu (feedback, donate, etc)
 - [ ] Build for Linux
+- [ ] Add language selection option (or detect automatically)
+- [ ] Add history of transcriptions
