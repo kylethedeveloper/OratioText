@@ -1,0 +1,32 @@
+[package]
+name = "oratiotext"
+version = "1.0.0"
+description = "A cross-platform desktop application for converting speech to text using Whisper"
+authors = ["kylethedeveloper"]
+edition = "2021"
+
+[lib]
+name = "oratiotext_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+tauri-plugin-shell = "2"
+whisper-rs = "0.14"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+reqwest = { version = "0.12", features = ["stream"] }
+tokio = { version = "1", features = ["full"] }
+dirs = "6"
+futures-util = "0.3"
+sysinfo = "0.33"
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1
+panic = "abort"

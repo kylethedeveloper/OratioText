@@ -9,127 +9,66 @@ on:
     types: [ published ]
 
 jobs:
-  build-macos:
+  build:
     strategy:
+      fail-fast: false
       matrix:
         include:
-          - name: apple-silicon
-            arch: arm64
-            runner: macos-26
-          - name: intel
-            arch: x86_64
-            runner: macos-26-intel
+          - platform: macos-26
+            target: aarch64-apple-darwin
+            name: macos-arm64
+          - platform: macos-26-intel
+            target: x86_64-apple-darwin
+            name: macos-x86_64
+          - platform: windows-latest
+            target: x86_64-pc-windows-msvc
+            name: windows-x86_64
 
-    runs-on: ${{ matrix.runner }}
-    
+    runs-on: ${{ matrix.platform }}
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
+    - name: Install Rust stable
+      uses: dtolnay/rust-toolchain@stable
       with:
-        python-version: '3.9'
+        targets: ${{ matrix.target }}
 
-    - name: Install system dependencies
+    - name: Install system dependencies (macOS)
+      if: runner.os == 'macOS'
       run: |
         brew install ffmpeg
 
-    - name: Cache Python dependencies
-      uses: actions/cache@v4
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-${{ matrix.arch }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-${{ matrix.arch }}-pip-
-
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pyinstaller pillow
-
-    - name: Build application
-      run: |
-        pyinstaller --clean OratioText.spec --distpath dist/${{ matrix.arch }}
-
-    - name: Create archive
-      run: |
-        cd dist/${{ matrix.arch }}
-        zip -r ../../OratioText-macos-${{ matrix.arch }}.zip OratioText.app
-
-    - name: Upload build artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: OratioText-macos-${{ matrix.arch }}
-        path: OratioText-macos-${{ matrix.arch }}.zip
-
-  build-windows:
-    runs-on: windows-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.9'
-
-    - name: Install FFmpeg
+    - name: Install system dependencies (Windows)
+      if: runner.os == 'Windows'
       run: |
         choco install ffmpeg -y
 
-    - name: Cache Python dependencies
-      uses: actions/cache@v4
+    - name: Rust cache
+      uses: swatinem/rust-cache@v2
       with:
-        path: ~\AppData\Local\pip\Cache
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
+        workspaces: src-tauri
 
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pyinstaller pillow
-
-    - name: Build application
-      run: |
-        pyinstaller --clean OratioText-windows.spec --distpath dist\windows
-
-    - name: Create archive
-      run: |
-        Compress-Archive -Path "dist\windows\OratioText\*" -DestinationPath "OratioText-windows.zip"
-
-    - name: Upload build artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: OratioText-windows
-        path: OratioText-windows.zip
-
-  release:
-    needs: [build-macos, build-windows]
-    if: github.event_name == 'release'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    
-    steps:
-    - name: Download all artifacts
-      uses: actions/download-artifact@v4
-      with:
-        path: release-artifacts
-        merge-multiple: false
-
-    - name: Upload release assets
-      uses: softprops/action-gh-release@v2
-      with:
-        files: |
-          release-artifacts/OratioText-macos-arm64/OratioText-macos-arm64.zip
-          release-artifacts/OratioText-macos-x86_64/OratioText-macos-x86_64.zip
-          release-artifacts/OratioText-windows/OratioText-windows.zip
-        draft: false
-        prerelease: false
+    - name: Build Tauri app
+      uses: tauri-apps/tauri-action@v0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        args: --target ${{ matrix.target }}
+        tagName: ${{ github.event_name == 'release' && github.ref_name || '' }}
+        releaseName: ${{ github.event_name == 'release' && github.ref_name || '' }}
+        releaseBody: ''
+        releaseDraft: false
+        prerelease: false
+
+    - name: Upload build artifacts
+      if: github.event_name != 'release'
+      uses: actions/upload-artifact@v4
+      with:
+        name: OratioText-${{ matrix.name }}
+        path: |
+          src-tauri/target/${{ matrix.target }}/release/bundle/**/*.dmg
+          src-tauri/target/${{ matrix.target }}/release/bundle/**/*.app
+          src-tauri/target/${{ matrix.target }}/release/bundle/**/*.msi
+          src-tauri/target/${{ matrix.target }}/release/bundle/**/*.exe
