@@ -186,10 +186,34 @@ impl Transcriber {
         self.convert_with_ffmpeg(path)
     }
 
+    /// Finds the ffmpeg binary by checking well-known installation paths first,
+    /// then falling back to bare "ffmpeg" (PATH lookup).
+    /// macOS .app bundles don't inherit the user's shell PATH, so Homebrew
+    /// paths like /opt/homebrew/bin won't be searched by default.
+    fn find_ffmpeg() -> String {
+        let candidates = [
+            "/opt/homebrew/bin/ffmpeg",   // macOS Apple Silicon (Homebrew)
+            "/usr/local/bin/ffmpeg",      // macOS Intel (Homebrew)
+            "/usr/bin/ffmpeg",            // System / Linux
+            "C:\\ProgramData\\chocolatey\\bin\\ffmpeg.exe", // Windows (Chocolatey)
+        ];
+
+        for path in &candidates {
+            if Path::new(path).exists() {
+                return path.to_string();
+            }
+        }
+
+        // Fall back to PATH lookup (works in dev / terminal)
+        "ffmpeg".to_string()
+    }
+
     fn convert_with_ffmpeg(&self, path: &Path) -> Result<Vec<f32>, Box<dyn std::error::Error>> {
         use std::process::Command;
 
-        let output = Command::new("ffmpeg")
+        let ffmpeg = Self::find_ffmpeg();
+
+        let output = Command::new(&ffmpeg)
             .args([
                 "-i",
                 &path.to_string_lossy(),
@@ -209,8 +233,8 @@ impl Transcriber {
             .output()
             .map_err(|e| {
                 format!(
-                    "Failed to run ffmpeg. Make sure ffmpeg is installed and in your PATH. Error: {}",
-                    e
+                    "Failed to run ffmpeg (tried '{}'). Make sure ffmpeg is installed. Error: {}",
+                    ffmpeg, e
                 )
             })?;
 
