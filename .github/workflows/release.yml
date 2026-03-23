@@ -6,35 +6,10 @@ on:
       - 'v*'
 
 jobs:
-  release:
+  release-macos-arm64:
+    runs-on: macos-latest
     permissions:
       contents: write
-      
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: macos-latest
-            target: aarch64-apple-darwin
-            name: macos-arm64
-            args: "--target aarch64-apple-darwin --bundles dmg"
-            cflags: "-mcpu=apple-m1 -U__ARM_FEATURE_MATMUL_INT8"
-            cxxflags: "-mcpu=apple-m1 -U__ARM_FEATURE_MATMUL_INT8"
-          - platform: macos-latest
-            target: x86_64-apple-darwin
-            name: macos-x86_64
-            args: "--target x86_64-apple-darwin --bundles dmg"
-            cflags: ""
-            cxxflags: ""
-          - platform: windows-latest
-            target: x86_64-pc-windows-msvc
-            name: windows-x86_64
-            args: "--target x86_64-pc-windows-msvc"
-            cflags: ""
-            cxxflags: ""
-
-    runs-on: ${{ matrix.platform }}
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -42,17 +17,10 @@ jobs:
     - name: Install Rust stable
       uses: dtolnay/rust-toolchain@stable
       with:
-        targets: ${{ matrix.target }}
+        targets: aarch64-apple-darwin
 
     - name: Install system dependencies (macOS)
-      if: runner.os == 'macOS'
-      run: |
-        brew install ffmpeg
-
-    - name: Install system dependencies (Windows)
-      if: runner.os == 'Windows'
-      run: |
-        choco install ffmpeg -y
+      run: brew install ffmpeg
 
     - name: Rust cache
       uses: swatinem/rust-cache@v2
@@ -73,10 +41,96 @@ jobs:
       uses: tauri-apps/tauri-action@v0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        CFLAGS: ${{ matrix.cflags }}
-        CXXFLAGS: ${{ matrix.cxxflags }}
+        CFLAGS: "-mcpu=apple-m1 -U__ARM_FEATURE_MATMUL_INT8"
+        CXXFLAGS: "-mcpu=apple-m1 -U__ARM_FEATURE_MATMUL_INT8"
       with:
-        args: ${{ matrix.args }}
+        args: "--target aarch64-apple-darwin --bundles dmg"
+        tagName: ${{ github.ref_name }}
+        releaseName: "OratioText ${{ github.ref_name }}"
+        releaseBody: "Download the attached assets to install OratioText."
+        releaseDraft: false
+        prerelease: ${{ steps.prerelease.outputs.is_prerelease == 'true' }}
+
+  release-macos-x86_64:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust stable
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: x86_64-apple-darwin
+
+    - name: Install system dependencies (macOS)
+      run: brew install ffmpeg
+
+    - name: Rust cache
+      uses: swatinem/rust-cache@v2
+      with:
+        workspaces: src-tauri
+
+    - name: Evaluate pre-release status
+      id: prerelease
+      run: |
+        if [[ "${{ github.ref_name }}" == *"-rc"* || "${{ github.ref_name }}" == *"-beta"* || "${{ github.ref_name }}" == *"-alpha"* ]]; then
+          echo "is_prerelease=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "is_prerelease=false" >> "$GITHUB_OUTPUT"
+        fi
+      shell: bash
+
+    - name: Build and Publish Tauri app
+      uses: tauri-apps/tauri-action@v0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        args: "--target x86_64-apple-darwin --bundles dmg"
+        tagName: ${{ github.ref_name }}
+        releaseName: "OratioText ${{ github.ref_name }}"
+        releaseBody: "Download the attached assets to install OratioText."
+        releaseDraft: false
+        prerelease: ${{ steps.prerelease.outputs.is_prerelease == 'true' }}
+
+  release-windows-x86_64:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust stable
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: x86_64-pc-windows-msvc
+
+    - name: Install system dependencies (Windows)
+      run: choco install ffmpeg -y
+
+    - name: Rust cache
+      uses: swatinem/rust-cache@v2
+      with:
+        workspaces: src-tauri
+
+    - name: Evaluate pre-release status
+      id: prerelease
+      run: |
+        if [[ "${{ github.ref_name }}" == *"-rc"* || "${{ github.ref_name }}" == *"-beta"* || "${{ github.ref_name }}" == *"-alpha"* ]]; then
+          echo "is_prerelease=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "is_prerelease=false" >> "$GITHUB_OUTPUT"
+        fi
+      shell: bash
+
+    - name: Build and Publish Tauri app
+      uses: tauri-apps/tauri-action@v0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        args: "--target x86_64-pc-windows-msvc"
         tagName: ${{ github.ref_name }}
         releaseName: "OratioText ${{ github.ref_name }}"
         releaseBody: "Download the attached assets to install OratioText."

@@ -7,32 +7,8 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: macos-latest
-            target: aarch64-apple-darwin
-            name: macos-arm64
-            args: "--target aarch64-apple-darwin --bundles dmg"
-            cflags: "-mcpu=apple-m1 -U__ARM_FEATURE_MATMUL_INT8"
-            cxxflags: "-mcpu=apple-m1 -U__ARM_FEATURE_MATMUL_INT8"
-          - platform: macos-latest
-            target: x86_64-apple-darwin
-            name: macos-x86_64
-            args: "--target x86_64-apple-darwin --bundles dmg"
-            cflags: ""
-            cxxflags: ""
-          - platform: windows-latest
-            target: x86_64-pc-windows-msvc
-            name: windows-x86_64
-            args: "--target x86_64-pc-windows-msvc"
-            cflags: ""
-            cxxflags: ""
-
-    runs-on: ${{ matrix.platform }}
-
+  build-macos-arm64:
+    runs-on: macos-latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -40,17 +16,10 @@ jobs:
     - name: Install Rust stable
       uses: dtolnay/rust-toolchain@stable
       with:
-        targets: ${{ matrix.target }}
+        targets: aarch64-apple-darwin
 
     - name: Install system dependencies (macOS)
-      if: runner.os == 'macOS'
-      run: |
-        brew install ffmpeg
-
-    - name: Install system dependencies (Windows)
-      if: runner.os == 'Windows'
-      run: |
-        choco install ffmpeg -y
+      run: brew install ffmpeg
 
     - name: Rust cache
       uses: swatinem/rust-cache@v2
@@ -61,17 +30,79 @@ jobs:
       uses: tauri-apps/tauri-action@v0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        CFLAGS: ${{ matrix.cflags }}
-        CXXFLAGS: ${{ matrix.cxxflags }}
+        CFLAGS: "-mcpu=apple-m1 -U__ARM_FEATURE_MATMUL_INT8"
+        CXXFLAGS: "-mcpu=apple-m1 -U__ARM_FEATURE_MATMUL_INT8"
       with:
-        args: ${{ matrix.args }}
+        args: "--target aarch64-apple-darwin --bundles dmg"
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: OratioText-${{ matrix.name }}
+        name: OratioText-macos-arm64
+        path: src-tauri/target/aarch64-apple-darwin/release/bundle/**/*.dmg
+
+  build-macos-x86_64:
+    runs-on: macos-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust stable
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: x86_64-apple-darwin
+
+    - name: Install system dependencies (macOS)
+      run: brew install ffmpeg
+
+    - name: Rust cache
+      uses: swatinem/rust-cache@v2
+      with:
+        workspaces: src-tauri
+
+    - name: Build Tauri app
+      uses: tauri-apps/tauri-action@v0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        args: "--target x86_64-apple-darwin --bundles dmg"
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: OratioText-macos-x86_64
+        path: src-tauri/target/x86_64-apple-darwin/release/bundle/**/*.dmg
+
+  build-windows-x86_64:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust stable
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: x86_64-pc-windows-msvc
+
+    - name: Install system dependencies (Windows)
+      run: choco install ffmpeg -y
+
+    - name: Rust cache
+      uses: swatinem/rust-cache@v2
+      with:
+        workspaces: src-tauri
+
+    - name: Build Tauri app
+      uses: tauri-apps/tauri-action@v0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        args: "--target x86_64-pc-windows-msvc"
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: OratioText-windows-x86_64
         path: |
-          src-tauri/target/${{ matrix.target }}/release/bundle/**/*.dmg
-          src-tauri/target/${{ matrix.target }}/release/bundle/**/*.app
-          src-tauri/target/${{ matrix.target }}/release/bundle/**/*.msi
-          src-tauri/target/${{ matrix.target }}/release/bundle/**/*.exe
+          src-tauri/target/x86_64-pc-windows-msvc/release/bundle/**/*.msi
+          src-tauri/target/x86_64-pc-windows-msvc/release/bundle/**/*.exe
