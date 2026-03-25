@@ -2,9 +2,9 @@ name: Build OratioText
 
 on:
   push:
-    branches: [ master, develop ]
-  pull_request:
-    branches: [ master ]
+    branches: [ develop ]
+  # pull_request:
+  #   branches: [ master ]
 
 jobs:
   build-macos-arm64:

@@ -25,6 +25,7 @@ const downloadProgress = document.getElementById("download-progress");
 const progressFill = document.getElementById("progress-fill");
 const progressText = document.getElementById("progress-text");
 const modelInfo = document.getElementById("model-info");
+const languageSelect = document.getElementById("language-select");
 const generateBtn = document.getElementById("generate-btn");
 const stopBtn = document.getElementById("stop-btn");
 const timestampsToggle = document.getElementById("timestamps-toggle");
@@ -35,14 +36,37 @@ const statusText = document.getElementById("status-text");
 const languageInfo = document.getElementById("language-info");
 const languageText = document.getElementById("language-text");
 
+// ---- Navigation Elements --------------------------------------------------
+const menuToggle = document.getElementById("menu-toggle");
+const navDropdown = document.getElementById("nav-dropdown");
+const navItems = document.querySelectorAll(".nav-item");
+const pages = {
+  home: document.getElementById("page-home"),
+  history: document.getElementById("page-history"),
+  about: document.getElementById("page-about"),
+};
+
 // ---- Initialization -------------------------------------------------------
 
 document.addEventListener("DOMContentLoaded", async () => {
   await loadModels();
+  await loadAppVersion();
   setupEventListeners();
   setupDownloadProgressListener();
   setupTranscriptionProgressListener();
 });
+
+async function loadAppVersion() {
+  try {
+    const version = await invoke("get_app_version");
+    const appVersionEl = document.getElementById("app-version");
+    if (appVersionEl) {
+      appVersionEl.textContent = `Version ${version}`;
+    }
+  } catch (err) {
+    console.error("Failed to load app version:", err);
+  }
+}
 
 async function loadModels() {
   try {
@@ -99,6 +123,37 @@ function setupEventListeners() {
   saveBtn.addEventListener("click", saveTranscription);
   timestampsToggle.addEventListener("change", updateTranscriptionDisplay);
   modelSelect.addEventListener("change", updateModelUI);
+
+  // Navigation events
+  menuToggle.addEventListener("click", () => {
+    navDropdown.classList.toggle("hidden");
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!menuToggle.contains(e.target) && !navDropdown.contains(e.target)) {
+      navDropdown.classList.add("hidden");
+    }
+  });
+
+  navItems.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const targetPage = btn.dataset.page;
+      navDropdown.classList.add("hidden");
+      
+      // Update active button
+      navItems.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      // Show target page, hide others
+      Object.keys(pages).forEach((page) => {
+        if (page === targetPage) {
+          pages[page].classList.remove("hidden");
+        } else {
+          pages[page].classList.add("hidden");
+        }
+      });
+    });
+  });
 }
 
 function setupDownloadProgressListener() {
@@ -217,6 +272,7 @@ async function startTranscription() {
     transcriptionResult = await invoke("transcribe", {
       filePath: selectedFilePath,
       modelName,
+      language: languageSelect.value
     });
 
     updateTranscriptionDisplay();

@@ -50,6 +50,7 @@ impl Transcriber {
     pub fn transcribe_with_progress<F>(
         &self,
         audio_path: &str,
+        language: Option<String>,
         on_progress: F,
         cancel_flag: Arc<AtomicBool>,
     ) -> Result<TranscriptionResult, Box<dyn std::error::Error>>
@@ -80,7 +81,15 @@ impl Transcriber {
 
         // Configure whisper parameters
         let mut params = FullParams::new(SamplingStrategy::Greedy { best_of: 1 });
-        params.set_language(None);
+        if let Some(ref lang) = language {
+            if lang == "auto" {
+               params.set_language(Some("auto"));
+            } else {
+               params.set_language(Some(lang.as_str()));
+            }
+        } else {
+            params.set_language(Some("auto"));
+        }
         params.set_print_progress(false);
         params.set_print_realtime(false);
         params.set_print_timestamps(false);

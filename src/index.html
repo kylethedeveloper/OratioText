@@ -1,17 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>OratioText</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
   <div class="app">
     <header class="app-header">
+      <button id="menu-toggle" class="theme-toggle" style="left: 0; right: auto;" title="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <path d="M4 6l16 0" />
+          <path d="M4 12l16 0" />
+          <path d="M4 18l16 0" />
+        </svg>
+      </button>
+
+      <div id="nav-dropdown" class="nav-dropdown hidden">
+        <button class="nav-item active" data-page="home">Home</button>
+        <button class="nav-item" data-page="history">History</button>
+        <button class="nav-item" data-page="about">About</button>
+      </div>
+
       <button id="theme-toggle" class="theme-toggle" title="Toggle light/dark theme">
-        <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454l0 .008" /></svg>
-        <svg id="icon-sun" class="hidden" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8 12a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /><path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7" /></svg>
+        <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454l0 .008" />
+        </svg>
+        <svg id="icon-sun" class="hidden" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <path d="M8 12a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
+          <path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7" />
+        </svg>
       </button>
       <div class="logo-area">
         <img src="appicon.png" alt="OratioText" class="app-icon" />
@@ -20,7 +47,7 @@
       <p class="tagline">Speech to Text — runs entirely on your computer</p>
     </header>
 
-    <main class="app-main">
+    <main class="app-main" id="page-home">
       <!-- File Selection -->
       <section class="card file-section">
         <label class="section-label">Audio / Video File</label>
@@ -48,6 +75,39 @@
 
       <!-- Generate / Stop -->
       <section class="action-section">
+        <div class="model-picker">
+          <select id="language-select">
+            <option value="auto" selected>Auto-Detect</option>
+            <option value="ar">Arabic</option>
+            <option value="zh">Chinese</option>
+            <option value="cs">Czech</option>
+            <option value="da">Danish</option>
+            <option value="nl">Dutch</option>
+            <option value="en">English</option>
+            <option value="fi">Finnish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="el">Greek</option>
+            <option value="he">Hebrew</option>
+            <option value="hi">Hindi</option>
+            <option value="hu">Hungarian</option>
+            <option value="id">Indonesian</option>
+            <option value="it">Italian</option>
+            <option value="ja">Japanese</option>
+            <option value="ko">Korean</option>
+            <option value="no">Norwegian</option>
+            <option value="pl">Polish</option>
+            <option value="pt">Portuguese</option>
+            <option value="ro">Romanian</option>
+            <option value="ru">Russian</option>
+            <option value="es">Spanish</option>
+            <option value="sv">Swedish</option>
+            <option value="th">Thai</option>
+            <option value="tr">Turkish</option>
+            <option value="uk">Ukrainian</option>
+            <option value="vi">Vietnamese</option>
+          </select>
+        </div>
         <button id="generate-btn" class="btn btn-primary" disabled>
           Generate Transcription
         </button>
@@ -86,8 +146,28 @@
         <span id="language-text"></span>
       </div>
     </main>
+
+    <main class="app-main hidden" id="page-history">
+      <section class="card">
+        <label class="section-label">History</label>
+        <p class="placeholder-text">History is empty for now.</p>
+      </section>
+    </main>
+
+    <main class="app-main hidden" id="page-about">
+      <section class="card about-section">
+        <p id="app-version" style="color: var(--color-text-muted); font-size: 0.9em; margin-bottom: 16px;">Loading
+          version...</p>
+        <p style="margin-bottom: 24px;">OratioText is a speech to text application that runs entirely on your local
+          machine, ensuring
+          full privacy.<br />It uses the whisper.cpp models under the hood.</p>
+        <a href="https://github.com/kylethedeveloper/OratioText" target="_blank" class="github-link"
+          style="color: var(--color-primary); text-decoration: none; font-weight: 600;">GitHub Repository</a>
+      </section>
+    </main>
   </div>
 
   <script src="main.js"></script>
 </body>
+
 </html>

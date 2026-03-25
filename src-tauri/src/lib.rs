@@ -43,6 +43,11 @@ struct ModelInfo {
 }
 
 #[tauri::command]
+fn get_app_version(app: tauri::AppHandle) -> String {
+    app.package_info().version.to_string()
+}
+
+#[tauri::command]
 fn get_system_info() -> SystemInfo {
     use sysinfo::System;
     let sys = System::new_all();
@@ -94,6 +99,7 @@ async fn download_model(
 async fn transcribe(
     file_path: String,
     model_name: String,
+    language: String,
     state: State<'_, AppState>,
     app: tauri::AppHandle,
 ) -> Result<TranscriptionResult, String> {
@@ -126,6 +132,7 @@ async fn transcribe(
         let result = t
             .transcribe_with_progress(
                 &file_path,
+                Some(language),
                 move |stage, percent| {
                     let _ = app_for_callback.emit(
                         "transcription-progress",
@@ -183,6 +190,7 @@ pub fn run() {
             transcribe,
             stop_transcription,
             save_file,
+            get_app_version,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
