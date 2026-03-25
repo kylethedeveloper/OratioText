@@ -4,7 +4,6 @@
 - [x] Add an icon
 - [x] Build for Windows and macOS (see [BUILD.md](./BUILD.md))
 - [x] Add language selection option (or detect automatically)
-- [ ] Add a help menu
 - [ ] Add an about menu (feedback, donate, etc)
 - [ ] Build for Linux
 - [ ] Add history of transcriptions

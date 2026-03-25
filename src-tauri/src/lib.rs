@@ -43,6 +43,11 @@ struct ModelInfo {
 }
 
 #[tauri::command]
+fn get_app_version(app: tauri::AppHandle) -> String {
+    app.package_info().version.to_string()
+}
+
+#[tauri::command]
 fn get_system_info() -> SystemInfo {
     use sysinfo::System;
     let sys = System::new_all();
@@ -185,6 +190,7 @@ pub fn run() {
             transcribe,
             stop_transcription,
             save_file,
+            get_app_version,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
