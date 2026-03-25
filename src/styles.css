@@ -75,7 +75,7 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md);
   gap: var(--spacing-md);
 }
 
@@ -437,7 +437,9 @@ body {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ==========================================================================

@@ -94,6 +94,7 @@ async fn download_model(
 async fn transcribe(
     file_path: String,
     model_name: String,
+    language: String,
     state: State<'_, AppState>,
     app: tauri::AppHandle,
 ) -> Result<TranscriptionResult, String> {
@@ -126,6 +127,7 @@ async fn transcribe(
         let result = t
             .transcribe_with_progress(
                 &file_path,
+                Some(language),
                 move |stage, percent| {
                     let _ = app_for_callback.emit(
                         "transcription-progress",

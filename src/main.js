@@ -25,6 +25,7 @@ const downloadProgress = document.getElementById("download-progress");
 const progressFill = document.getElementById("progress-fill");
 const progressText = document.getElementById("progress-text");
 const modelInfo = document.getElementById("model-info");
+const languageSelect = document.getElementById("language-select");
 const generateBtn = document.getElementById("generate-btn");
 const stopBtn = document.getElementById("stop-btn");
 const timestampsToggle = document.getElementById("timestamps-toggle");
@@ -217,6 +218,7 @@ async function startTranscription() {
     transcriptionResult = await invoke("transcribe", {
       filePath: selectedFilePath,
       modelName,
+      language: languageSelect.value
     });
 
     updateTranscriptionDisplay();
