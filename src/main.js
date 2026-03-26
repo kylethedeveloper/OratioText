@@ -462,3 +462,62 @@ function toggleTheme() {
 themeToggle.addEventListener("click", toggleTheme);
 initTheme();
 
+// ---- Update Check ---------------------------------------------------------
+
+const checkUpdateBtn = document.getElementById("check-update-btn");
+const updateStatus = document.getElementById("update-status");
+
+if (checkUpdateBtn) {
+  checkUpdateBtn.addEventListener("click", checkForUpdates);
+}
+
+async function checkForUpdates() {
+  checkUpdateBtn.disabled = true;
+  checkUpdateBtn.textContent = "Checking...";
+  updateStatus.classList.add("hidden");
+  
+  try {
+    const response = await fetch("https://api.github.com/repos/kylethedeveloper/OratioText/releases/latest");
+    if (!response.ok) throw new Error("Failed to check for updates");
+    const data = await response.json();
+    
+    // Tag names typically have a 'v' prefix, e.g. 'v1.0.1'. Clean it up easily:
+    const latestVersion = data.tag_name.replace(/^v/, '');
+    const currentVersion = await invoke("get_app_version");
+    
+    const isNewer = compareVersions(latestVersion, currentVersion) > 0;
+    
+    updateStatus.classList.remove("hidden");
+    if (isNewer) {
+      updateStatus.textContent = "⚠ Newer version available!";
+      updateStatus.style.color = "var(--color-warning)";
+      updateStatus.style.pointerEvents = "auto";
+      updateStatus.style.cursor = "pointer";
+    } else {
+      updateStatus.textContent = "☑ App up to date!";
+      updateStatus.style.color = "var(--color-success)";
+      updateStatus.style.pointerEvents = "none";
+      updateStatus.style.cursor = "default";
+    }
+  } catch (err) {
+    console.error("Update check failed", err);
+    updateStatus.textContent = "Failed to check update.";
+    updateStatus.style.color = "var(--color-error)";
+    updateStatus.classList.remove("hidden");
+  } finally {
+    checkUpdateBtn.disabled = false;
+    checkUpdateBtn.textContent = "Check for updates";
+  }
+}
+
+function compareVersions(v1, v2) {
+  const parts1 = v1.split('.').map(Number);
+  const parts2 = v2.split('.').map(Number);
+  for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
+    const n1 = parts1[i] || 0;
+    const n2 = parts2[i] || 0;
+    if (n1 > n2) return 1;
+    if (n1 < n2) return -1;
+  }
+  return 0;
+}

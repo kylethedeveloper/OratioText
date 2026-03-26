@@ -156,13 +156,33 @@
 
     <main class="app-main hidden" id="page-about">
       <section class="card about-section">
-        <p id="app-version" style="color: var(--color-text-muted); font-size: 0.9em; margin-bottom: 16px;">Loading
-          version...</p>
+        <div
+          style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; margin-bottom: 16px;">
+          <p id="app-version" style="color: var(--color-text-muted); font-size: 0.9em; margin: 0;">Loading version...
+          </p>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button id="check-update-btn" class="btn btn-secondary btn-sm"
+              style="padding: 2px 8px; font-size: 0.75em;">Check for updates</button>
+            <a id="update-status" href="https://github.com/kylethedeveloper/OratioText/releases" target="_blank"
+              class="hidden" style="font-size: 0.8em; text-decoration: none; font-weight: 600;"></a>
+          </div>
+        </div>
         <p style="margin-bottom: 24px;">OratioText is a speech to text application that runs entirely on your local
           machine, ensuring
           full privacy.<br />It uses the whisper.cpp models under the hood.</p>
-        <a href="https://github.com/kylethedeveloper/OratioText" target="_blank" class="github-link"
-          style="color: var(--color-primary); text-decoration: none; font-weight: 600;">GitHub Repository</a>
+        <div style="margin-bottom: 16px;">
+          <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+            data-name="bmc-button" data-slug="kylethedev" data-color="#cdfd84" data-emoji="☕" data-font="Bree"
+            data-text="Support me!" data-outline-color="#000000" data-font-color="#000000"
+            data-coffee-color="#FFDD00"></script>
+        </div>
+        <div style="display: flex; gap: 16px; align-items: center;">
+          <a href="https://github.com/kylethedeveloper/OratioText" target="_blank" class="github-link"
+            style="color: var(--color-primary); text-decoration: none; font-weight: 600;">GitHub Repository</a>
+          <span style="color: var(--color-border);">|</span>
+          <a href="https://github.com/kylethedeveloper/OratioText/issues/new" target="_blank" class="github-link"
+            style="color: var(--color-primary); text-decoration: none; font-weight: 600;">Report an Issue</a>
+        </div>
       </section>
     </main>
   </div>
