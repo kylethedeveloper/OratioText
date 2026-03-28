@@ -43,6 +43,7 @@ const navItems = document.querySelectorAll(".nav-item");
 const pages = {
   home: document.getElementById("page-home"),
   history: document.getElementById("page-history"),
+  settings: document.getElementById("page-settings"),
   about: document.getElementById("page-about"),
 };
 
@@ -422,45 +423,109 @@ function setLoading(loading, message = "Processing...") {
   }
 }
 
-// ---- Theme Toggle ---------------------------------------------------------
+// ---- Theme & App Settings ---------------------------------------------------------
 
 const themeToggle = document.getElementById("theme-toggle");
 const iconMoon = document.getElementById("icon-moon");
 const iconSun = document.getElementById("icon-sun");
+const iconSystem = document.getElementById("icon-system");
+const appThemeSelect = document.getElementById("app-theme-select");
+const appLanguageSelect = document.getElementById("app-language-select");
 
-function setThemeIcons(isLight) {
-  if (isLight) {
-    iconMoon.classList.add("hidden");
+function setThemeIcons(theme) {
+  iconMoon.classList.add("hidden");
+  iconSun.classList.add("hidden");
+  iconSystem.classList.add("hidden");
+
+  if (theme === "light") {
     iconSun.classList.remove("hidden");
-  } else {
+  } else if (theme === "dark") {
     iconMoon.classList.remove("hidden");
-    iconSun.classList.add("hidden");
+  } else {
+    iconSystem.classList.remove("hidden");
   }
+}
+
+function applyTheme(theme) {
+  let isLight = false;
+  
+  if (theme === "system") {
+    isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+  } else {
+    isLight = (theme === "light");
+  }
+  
+  if (isLight) {
+    document.documentElement.setAttribute("data-theme", "light");
+  } else {
+    document.documentElement.removeAttribute("data-theme");
+  }
+  
+  setThemeIcons(theme);
 }
 
 function initTheme() {
-  const saved = localStorage.getItem("oratiotext-theme");
-  if (saved === "light") {
-    document.documentElement.setAttribute("data-theme", "light");
-    setThemeIcons(true);
+  const savedTheme = localStorage.getItem("oratiotext-theme") || "system";
+  
+  if (appThemeSelect) {
+    appThemeSelect.value = savedTheme;
   }
+  
+  applyTheme(savedTheme);
+
+  // Listen for system theme changes if set to system
+  window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (e) => {
+    if ((localStorage.getItem("oratiotext-theme") || "system") === "system") {
+      applyTheme("system");
+    }
+  });
 }
 
 function toggleTheme() {
-  const isLight = document.documentElement.getAttribute("data-theme") === "light";
-  if (isLight) {
-    document.documentElement.removeAttribute("data-theme");
-    localStorage.setItem("oratiotext-theme", "dark");
-    setThemeIcons(false);
+  const currentSaved = localStorage.getItem("oratiotext-theme") || "system";
+  let nextTheme = "dark";
+  
+  if (currentSaved === "dark") {
+    nextTheme = "light";
+  } else if (currentSaved === "light") {
+    nextTheme = "system";
   } else {
-    document.documentElement.setAttribute("data-theme", "light");
-    localStorage.setItem("oratiotext-theme", "light");
-    setThemeIcons(true);
+    nextTheme = "dark"; // Default to dark from system
   }
+  
+  localStorage.setItem("oratiotext-theme", nextTheme);
+  if (appThemeSelect) {
+    appThemeSelect.value = nextTheme;
+  }
+  applyTheme(nextTheme);
 }
 
 themeToggle.addEventListener("click", toggleTheme);
-initTheme();
+
+function initSettings() {
+  initTheme();
+  
+  if (appThemeSelect) {
+    appThemeSelect.addEventListener("change", (e) => {
+      const theme = e.target.value;
+      localStorage.setItem("oratiotext-theme", theme);
+      applyTheme(theme);
+    });
+  }
+
+  const savedLang = localStorage.getItem("oratiotext-app-language");
+  if (savedLang && appLanguageSelect) {
+    appLanguageSelect.value = savedLang;
+  }
+  
+  if (appLanguageSelect) {
+    appLanguageSelect.addEventListener("change", (e) => {
+      localStorage.setItem("oratiotext-app-language", e.target.value);
+    });
+  }
+}
+
+initSettings();
 
 // ---- Update Check ---------------------------------------------------------
 

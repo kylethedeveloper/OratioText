@@ -22,8 +22,13 @@ Built with [Tauri v2](https://tauri.app/) and [whisper.cpp](https://github.com/g
 - **Backend**: Rust with [whisper-rs](https://github.com/tazz4843/whisper-rs) bindings
 - **Audio conversion**: FFmpeg (must be installed separately)
 
+## Installation
 
-## Usage
+You can download the latest installers and packages for your operating system from the [GitHub Releases](https://github.com/kylethedeveloper/OratioText/releases) page.
+
+Choose the appropriate `.dmg` or `.msi` file to install OratioText easily!
+
+## Basic Usage
 
 1. Select an audio/video file using the file picker
 2. Choose a Whisper model (download if needed)
@@ -36,7 +41,7 @@ Built with [Tauri v2](https://tauri.app/) and [whisper.cpp](https://github.com/g
 - FFmpeg installed and in PATH
 - Internet connection for initial model download
 
-## macOS Installation Note
+### macOS Installation Note
 
 Since the app is not signed with an Apple Developer certificate (yet), macOS Gatekeeper may show a warning saying **"OratioText is damaged and can't be opened"**. This is expected for unsigned open-source apps.
 
@@ -46,7 +51,7 @@ To fix this, run the following command in Terminal after installing the app:
 xattr -cr /Applications/OratioText.app
 ```
 
-Then open the app normally. Alternatively, you can right-click the app and select **Open** to bypass the warning on first launch.
+Then open the app normally.
 
 ## Development
 
