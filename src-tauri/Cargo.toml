@@ -1,6 +1,6 @@
 [package]
 name = "oratiotext"
-version = "1.0.3"
+version = "1.0.4"
 description = "A cross-platform desktop application for converting speech to text using Whisper"
 authors = ["kylethedeveloper"]
 edition = "2021"

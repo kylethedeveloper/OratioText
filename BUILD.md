@@ -2,11 +2,12 @@
 
 ## Prerequisites
 
-| Requirement | macOS | Windows |
-|---|---|---|
-| Rust | [rustup.rs](https://rustup.rs/) | [rustup.rs](https://rustup.rs/) |
-| Node.js | `brew install node` | [nodejs.org](https://nodejs.org/) |
-| FFmpeg | `brew install ffmpeg` | `choco install ffmpeg` |
+| Requirement | macOS | Windows | Linux (Debian/Ubuntu) |
+|---|---|---|---|
+| Rust | [rustup.rs](https://rustup.rs/) | [rustup.rs](https://rustup.rs/) | [rustup.rs](https://rustup.rs/) |
+| Node.js | `brew install node` | [nodejs.org](https://nodejs.org/) | `sudo apt install nodejs npm` |
+| FFmpeg | `brew install ffmpeg` | `choco install ffmpeg` | `sudo apt install ffmpeg` |
+| System libs | — | — | `sudo apt install libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev patchelf` |
 
 ## Local Build
 
@@ -27,6 +28,7 @@ cargo tauri build
 Output:
 - **macOS**: `src-tauri/target/release/bundle/dmg/OratioText_*.dmg`
 - **Windows**: `src-tauri/target/release/bundle/msi/OratioText_*.msi`
+- **Linux**: `src-tauri/target/release/bundle/deb/OratioText_*.deb` and `src-tauri/target/release/bundle/appimage/OratioText_*.AppImage`
 
 ## GitHub Actions CI
 
@@ -45,6 +47,7 @@ The workflow (`.github/workflows/build.yml`) uses the official [Tauri Action](ht
 | macOS Apple Silicon | `aarch64-apple-darwin` | `.dmg` |
 | macOS Intel | `x86_64-apple-darwin` | `.dmg` |
 | Windows | `x86_64-pc-windows-msvc` | `.msi` / `.exe` |
+| Linux | `x86_64-unknown-linux-gnu` | `.deb` / `.AppImage` |
 
 ### Accessing Build Artifacts
 
@@ -75,6 +78,7 @@ src/                 # Frontend (HTML/CSS/JS)
 Models are **not bundled** with the app. They are downloaded from [Hugging Face](https://huggingface.co/ggerganov/whisper.cpp) on first use and cached in:
 - **macOS**: `~/Library/Application Support/OratioText/models/`
 - **Windows**: `%APPDATA%/OratioText/models/`
+- **Linux**: `~/.local/share/OratioText/models/`
 
 | Model | Size | Quality |
 |---|---|---|
