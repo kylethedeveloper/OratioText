@@ -24,11 +24,12 @@
       <div id="nav-dropdown" class="nav-dropdown hidden">
         <button class="nav-item active" data-page="home">Home</button>
         <button class="nav-item" data-page="history">History</button>
+        <button class="nav-item" data-page="settings">Settings</button>
         <button class="nav-item" data-page="about">About</button>
       </div>
 
-      <button id="theme-toggle" class="theme-toggle" title="Toggle light/dark theme">
-        <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+      <button id="theme-toggle" class="theme-toggle" title="Toggle light/dark/system theme">
+        <svg id="icon-moon" class="hidden" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path stroke="none" d="M0 0h24v24H0z" fill="none" />
           <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454l0 .008" />
@@ -38,6 +39,10 @@
           <path stroke="none" d="M0 0h24v24H0z" fill="none" />
           <path d="M8 12a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
           <path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7" />
+        </svg>
+        <svg id="icon-system" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="icon icon-tabler icons-tabler-filled icon-tabler-brightness">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <path d="M17 3.34a10 10 0 1 1 -15 8.66l.005 -.324a10 10 0 0 1 14.995 -8.336m-9 1.732a8 8 0 0 0 4.001 14.928l-.001 -16a8 8 0 0 0 -4 1.072" />
         </svg>
       </button>
       <div class="logo-area">
@@ -151,6 +156,40 @@
       <section class="card">
         <label class="section-label">History</label>
         <p class="placeholder-text">History is empty for now.</p>
+      </section>
+    </main>
+
+    <main class="app-main hidden" id="page-settings">
+      <section class="card">
+        <label class="section-label">Settings</label>
+        
+        <div class="settings-list">
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-name">Theme</span>
+              <span class="setting-description">Application appearance</span>
+            </div>
+            <div class="setting-control">
+              <select id="app-theme-select">
+                <option value="system">System Default</option>
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-name">Language</span>
+              <span class="setting-description">Application interface language</span>
+            </div>
+            <div class="setting-control">
+              <select id="app-language-select">
+                <option value="en" selected>English</option>
+              </select>
+            </div>
+          </div>
+        </div>
       </section>
     </main>
 

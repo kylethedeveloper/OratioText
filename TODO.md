@@ -4,6 +4,10 @@
 - [x] Add an icon
 - [x] Build for Windows and macOS (see [BUILD.md](./BUILD.md))
 - [x] Add language selection option (or detect automatically)
-- [ ] Add an about menu (feedback, donate, etc)
+- [x] Add an about menu (feedback, donate, etc)
+- [x] Add a settings menu
+- [ ] Add option to transcribe from URL
 - [ ] Build for Linux
 - [ ] Add history of transcriptions
+- [ ] Send notifications when transcription is complete
+- [ ] Add option to manage downloaded models in Settings (delete, etc.)
