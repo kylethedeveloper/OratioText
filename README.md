@@ -26,7 +26,10 @@ Built with [Tauri v2](https://tauri.app/) and [whisper.cpp](https://github.com/g
 
 You can download the latest installers and packages for your operating system from the [GitHub Releases](https://github.com/kylethedeveloper/OratioText/releases) page.
 
-Choose the appropriate `.dmg` or `.msi` file to install OratioText easily!
+Choose the appropriate file for your platform:
+- **macOS**: `.dmg`
+- **Windows**: `.msi` or `.exe`
+- **Linux**: `.deb` or `.AppImage`
 
 ## Basic Usage
 
@@ -37,7 +40,7 @@ Choose the appropriate `.dmg` or `.msi` file to install OratioText easily!
 
 ## System Requirements
 
-- macOS 10.15+ or Windows 10+
+- macOS 10.15+, Windows 10+, or Linux (Ubuntu 22.04+ / equivalent)
 - FFmpeg installed and in PATH
 - Internet connection for initial model download
 
@@ -52,6 +55,27 @@ xattr -cr /Applications/OratioText.app
 ```
 
 Then open the app normally.
+
+### Linux Installation Note
+
+If you downloaded the `.AppImage`, you need to make it executable before running:
+
+```bash
+chmod +x OratioText_*.AppImage
+./OratioText_*.AppImage
+```
+
+For the `.deb` package, install it with:
+
+```bash
+sudo dpkg -i OratioText_*.deb
+```
+
+Make sure you have FFmpeg and the required WebKit2GTK runtime libraries installed:
+
+```bash
+sudo apt install ffmpeg libwebkit2gtk-4.1-0
+```
 
 ## Development
 
