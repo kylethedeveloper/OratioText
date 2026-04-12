@@ -53,6 +53,23 @@ impl ModelManager {
             .exists()
     }
 
+    /// Deletes a downloaded model file. Returns an error if the model is not downloaded.
+    pub fn delete_model(&self, model_name: &str) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        let path = self.models_dir.join(Self::model_filename(model_name));
+        if path.exists() {
+            std::fs::remove_file(&path)?;
+            Ok(())
+        } else {
+            Err(format!("Model '{}' is not downloaded", model_name).into())
+        }
+    }
+
+    /// Returns the file size in bytes for a downloaded model, or None if not downloaded.
+    pub fn get_model_file_size(&self, model_name: &str) -> Option<u64> {
+        let path = self.models_dir.join(Self::model_filename(model_name));
+        std::fs::metadata(&path).ok().map(|m| m.len())
+    }
+
     /// Downloads a model from Hugging Face, emitting progress events to the frontend.
     pub async fn download_model(
         &self,
