@@ -613,6 +613,7 @@ async function deleteDownloadedModel(modelName, rowEl) {
       deleteBtn.disabled = false;
       deleteBtn.textContent = "Delete";
       deleteBtn.dataset.confirming = "false";
+      deleteBtn.classList.remove("btn-danger-confirm");
       rowEl.classList.remove("model-row-deleting");
       const errMsg = document.createElement("span");
       errMsg.className = "model-delete-error";
