@@ -295,6 +295,7 @@ body {
 .setting-control select:focus {
   border-color: var(--color-primary);
 }
+
 /* ==========================================================================
    File Picker
    ========================================================================== */
@@ -653,4 +654,118 @@ body {
   font-weight: 600;
   color: var(--color-text-muted);
   font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   Downloaded Models Manager (Settings)
+   ========================================================================== */
+
+.models-manager-card {
+  flex-shrink: 0;
+}
+
+.models-manager-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.models-total-size {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.downloaded-models-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.model-manager-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-sm) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.model-manager-row:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-border);
+}
+
+.model-manager-row.model-row-deleting {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.model-manager-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.model-manager-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+  text-transform: capitalize;
+  min-width: 60px;
+}
+
+.model-manager-meta {
+  font-size: 0.775rem;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.model-delete-btn {
+  opacity: 0.65;
+  transition: opacity var(--transition), background var(--transition);
+}
+
+.model-delete-btn:hover:not(:disabled) {
+  opacity: 0.65;
+}
+
+.btn-danger-confirm {
+  opacity: 1 !important;
+  background: rgba(248, 113, 113, 0.3) !important;
+  border-color: var(--color-error) !important;
+  color: var(--color-error) !important;
+  animation: pulse-danger 0.6s ease infinite alternate;
+}
+
+@keyframes pulse-danger {
+  from {
+    box-shadow: 0 0 0 0 rgba(248, 113, 113, 0);
+  }
+
+  to {
+    box-shadow: 0 0 6px 2px rgba(248, 113, 113, 0.3);
+  }
+}
+
+.model-delete-error {
+  font-size: 0.75rem;
+  color: var(--color-error);
+  margin-left: var(--spacing-sm);
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

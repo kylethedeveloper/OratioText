@@ -7,6 +7,9 @@ use tauri::Emitter;
 const HUGGINGFACE_BASE_URL: &str =
     "https://huggingface.co/ggerganov/whisper.cpp/resolve/main";
 
+/// Allowlist of valid model identifiers accepted by ModelManager.
+const VALID_MODEL_NAMES: &[&str] = &["tiny", "base", "small", "medium", "turbo", "large"];
+
 /// Manages Whisper GGML model files: download, cache, and lookup.
 pub struct ModelManager {
     models_dir: PathBuf,
@@ -22,7 +25,19 @@ impl ModelManager {
         // Ensure directory exists
         std::fs::create_dir_all(&models_dir).ok();
 
+        // Canonicalize so all path comparisons use a resolved, absolute path.
+        let models_dir = models_dir.canonicalize().unwrap_or(models_dir);
+
         Self { models_dir }
+    }
+
+    /// Returns an error if `model_name` is not in the allowlist of known model IDs.
+    fn validate_model_name(model_name: &str) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        if VALID_MODEL_NAMES.contains(&model_name) {
+            Ok(())
+        } else {
+            Err(format!("Unknown model '{}'", model_name).into())
+        }
     }
 
     /// Returns the filename for a given model name.
@@ -51,6 +66,29 @@ impl ModelManager {
         self.models_dir
             .join(Self::model_filename(model_name))
             .exists()
+    }
+
+    /// Deletes a downloaded model file. Returns an error if the model is not downloaded.
+    pub fn delete_model(&self, model_name: &str) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        Self::validate_model_name(model_name)?;
+        let path = self.models_dir.join(Self::model_filename(model_name));
+        if path.exists() {
+            // Verify the resolved path is still within models_dir to prevent path traversal.
+            let canonical_path = path.canonicalize()?;
+            if !canonical_path.starts_with(&self.models_dir) {
+                return Err("Path traversal attempt detected".into());
+            }
+            std::fs::remove_file(&canonical_path)?;
+            Ok(())
+        } else {
+            Err(format!("Model '{}' is not downloaded", model_name).into())
+        }
+    }
+
+    /// Returns the file size in bytes for a downloaded model, or None if not downloaded.
+    pub fn get_model_file_size(&self, model_name: &str) -> Option<u64> {
+        let path = self.models_dir.join(Self::model_filename(model_name));
+        std::fs::metadata(&path).ok().map(|m| m.len())
     }
 
     /// Downloads a model from Hugging Face, emitting progress events to the frontend.
