@@ -625,7 +625,7 @@ async function deleteDownloadedModel(modelName, rowEl) {
     deleteBtn.dataset.confirming = "true";
     deleteBtn.textContent = "Confirm?";
     deleteBtn.classList.add("btn-danger-confirm");
-    // Auto-reset after 3 s
+    // Auto-reset after 10 s
     setTimeout(() => {
       if (deleteBtn.dataset.confirming === "true") {
         deleteBtn.dataset.confirming = "false";
