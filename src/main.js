@@ -617,7 +617,8 @@ async function deleteDownloadedModel(modelName, rowEl) {
       rowEl.classList.remove("model-row-deleting");
       const errMsg = document.createElement("span");
       errMsg.className = "model-delete-error";
-      errMsg.textContent = `Error: ${err}`;
+      const errorText = err?.message ?? String(err);
+      errMsg.textContent = `Error: ${errorText}`;
       rowEl.appendChild(errMsg);
       setTimeout(() => errMsg.remove(), 3000);
     }
