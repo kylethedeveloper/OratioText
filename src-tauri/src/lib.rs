@@ -92,6 +92,14 @@ fn delete_model(model_name: String, state: State<AppState>) -> Result<(), String
 }
 
 #[tauri::command]
+fn open_models_dir(app: tauri::AppHandle, state: State<AppState>) -> Result<(), String> {
+    let path = state.model_manager.get_models_dir();
+    use tauri_plugin_shell::ShellExt;
+    app.shell().open(path.to_string_lossy().to_string(), None)
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
 async fn download_model(
     model_name: String,
     state: State<'_, AppState>,
@@ -202,6 +210,7 @@ pub fn run() {
             stop_transcription,
             save_file,
             get_app_version,
+            open_models_dir,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

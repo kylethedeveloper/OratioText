@@ -31,6 +31,11 @@ impl ModelManager {
         Self { models_dir }
     }
 
+    /// Returns the models directory path.
+    pub fn get_models_dir(&self) -> PathBuf {
+        self.models_dir.clone()
+    }
+
     /// Returns an error if `model_name` is not in the allowlist of known model IDs.
     fn validate_model_name(model_name: &str) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         if VALID_MODEL_NAMES.contains(&model_name) {

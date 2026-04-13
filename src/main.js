@@ -656,6 +656,14 @@ navItems.forEach((btn) => {
   });
 });
 
+document.getElementById("open-models-dir-btn")?.addEventListener("click", async () => {
+  try {
+    await invoke("open_models_dir");
+  } catch (err) {
+    console.error("Failed to open models directory:", err);
+  }
+});
+
 // ---- Update Check ---------------------------------------------------------
 
 const checkUpdateBtn = document.getElementById("check-update-btn");
