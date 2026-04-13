@@ -40,6 +40,7 @@ struct ModelInfo {
     name: String,
     size: String,
     downloaded: bool,
+    file_size_bytes: Option<u64>,
 }
 
 #[tauri::command]
@@ -77,8 +78,25 @@ fn list_models(state: State<AppState>) -> Vec<ModelInfo> {
             name: name.to_string(),
             size: size.to_string(),
             downloaded: state.model_manager.is_model_downloaded(name),
+            file_size_bytes: state.model_manager.get_model_file_size(name),
         })
         .collect()
+}
+
+#[tauri::command]
+fn delete_model(model_name: String, state: State<AppState>) -> Result<(), String> {
+    state
+        .model_manager
+        .delete_model(&model_name)
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn open_models_dir(app: tauri::AppHandle, state: State<AppState>) -> Result<(), String> {
+    let path = state.model_manager.get_models_dir();
+    use tauri_plugin_shell::ShellExt;
+    app.shell().open(path.to_string_lossy().to_string(), None)
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -187,10 +205,12 @@ pub fn run() {
             get_system_info,
             list_models,
             download_model,
+            delete_model,
             transcribe,
             stop_transcription,
             save_file,
             get_app_version,
+            open_models_dir,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

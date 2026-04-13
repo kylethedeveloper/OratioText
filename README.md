@@ -1,5 +1,10 @@
 # OratioText
 
+[![Release](https://img.shields.io/github/v/release/kylethedeveloper/OratioText)](https://github.com/kylethedeveloper/OratioText/releases)
+[![License](https://img.shields.io/github/license/kylethedeveloper/OratioText)](./LICENSE)
+![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey)
+![Tauri v2](https://img.shields.io/badge/Tauri-v2-green?logo=tauri)
+
 | <img src="assets/appicon.png" alt="OratioText Icon" width="200" height="auto"> | A cross-platform desktop application for converting speech to text using [Whisper](https://github.com/ggerganov/whisper.cpp). This application only <ins>**runs on your computer**</ins> and uses the AI model <ins>locally</ins>. |
 | :-------------------: | :----------: |
 
@@ -21,6 +26,11 @@ Built with [Tauri v2](https://tauri.app/) and [whisper.cpp](https://github.com/g
 - **Frontend**: HTML / CSS / JavaScript (rendered in system WebView)
 - **Backend**: Rust with [whisper-rs](https://github.com/tazz4843/whisper-rs) bindings
 - **Audio conversion**: FFmpeg (must be installed separately)
+
+## Screenshots
+
+| ![Screenshot 1](assets/screenshot1.png) | ![Screenshot 2](assets/screenshot2.png) |
+| :---: | :---: |
 
 ## Installation
 

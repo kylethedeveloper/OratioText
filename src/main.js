@@ -140,7 +140,7 @@ function setupEventListeners() {
     btn.addEventListener("click", () => {
       const targetPage = btn.dataset.page;
       navDropdown.classList.add("hidden");
-      
+
       // Update active button
       navItems.forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
@@ -448,29 +448,29 @@ function setThemeIcons(theme) {
 
 function applyTheme(theme) {
   let isLight = false;
-  
+
   if (theme === "system") {
     isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
   } else {
     isLight = (theme === "light");
   }
-  
+
   if (isLight) {
     document.documentElement.setAttribute("data-theme", "light");
   } else {
     document.documentElement.removeAttribute("data-theme");
   }
-  
+
   setThemeIcons(theme);
 }
 
 function initTheme() {
   const savedTheme = localStorage.getItem("oratiotext-theme") || "system";
-  
+
   if (appThemeSelect) {
     appThemeSelect.value = savedTheme;
   }
-  
+
   applyTheme(savedTheme);
 
   // Listen for system theme changes if set to system
@@ -484,7 +484,7 @@ function initTheme() {
 function toggleTheme() {
   const currentSaved = localStorage.getItem("oratiotext-theme") || "system";
   let nextTheme = "dark";
-  
+
   if (currentSaved === "dark") {
     nextTheme = "light";
   } else if (currentSaved === "light") {
@@ -492,7 +492,7 @@ function toggleTheme() {
   } else {
     nextTheme = "dark"; // Default to dark from system
   }
-  
+
   localStorage.setItem("oratiotext-theme", nextTheme);
   if (appThemeSelect) {
     appThemeSelect.value = nextTheme;
@@ -504,7 +504,7 @@ themeToggle.addEventListener("click", toggleTheme);
 
 function initSettings() {
   initTheme();
-  
+
   if (appThemeSelect) {
     appThemeSelect.addEventListener("change", (e) => {
       const theme = e.target.value;
@@ -517,7 +517,7 @@ function initSettings() {
   if (savedLang && appLanguageSelect) {
     appLanguageSelect.value = savedLang;
   }
-  
+
   if (appLanguageSelect) {
     appLanguageSelect.addEventListener("change", (e) => {
       localStorage.setItem("oratiotext-app-language", e.target.value);
@@ -526,6 +526,144 @@ function initSettings() {
 }
 
 initSettings();
+
+// ---- Downloaded Models Manager (Settings) ---------------------------------
+
+async function renderDownloadedModels() {
+  const list = document.getElementById("downloaded-models-list");
+  const totalSizeEl = document.getElementById("models-total-size");
+  if (!list) return;
+
+  try {
+    const models = await invoke("list_models");
+    const downloaded = models.filter((m) => m.downloaded);
+
+    if (downloaded.length === 0) {
+      list.innerHTML = '<p class="placeholder-text">No models downloaded yet.</p>';
+      if (totalSizeEl) totalSizeEl.textContent = "";
+      return;
+    }
+
+    // Compute total size
+    const totalBytes = downloaded.reduce((sum, m) => sum + (m.file_size_bytes || 0), 0);
+    if (totalSizeEl) {
+      totalSizeEl.textContent = `Total: ${formatFileSize(totalBytes)}`;
+    }
+
+    list.innerHTML = "";
+    downloaded.forEach((model) => {
+      const row = document.createElement("div");
+      row.className = "model-manager-row";
+      row.dataset.modelName = model.name;
+
+      const info = document.createElement("div");
+      info.className = "model-manager-info";
+
+      const name = document.createElement("span");
+      name.className = "model-manager-name";
+      name.textContent = model.name;
+
+      const meta = document.createElement("span");
+      meta.className = "model-manager-meta";
+      const sizeOnDisk = model.file_size_bytes
+        ? formatFileSize(model.file_size_bytes)
+        : model.size;
+      meta.textContent = sizeOnDisk;
+
+      info.appendChild(name);
+      info.appendChild(meta);
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "btn btn-danger btn-sm model-delete-btn";
+      deleteBtn.textContent = "Delete";
+      deleteBtn.title = `Delete ${model.name} model`;
+      deleteBtn.addEventListener("click", () => deleteDownloadedModel(model.name, row));
+
+      row.appendChild(info);
+      row.appendChild(deleteBtn);
+      list.appendChild(row);
+    });
+  } catch (err) {
+    list.innerHTML = `<p style="color: var(--color-error); font-size: 0.85rem;">Failed to load models: ${escapeHtml(String(err))}</p>`;
+  }
+}
+
+async function deleteDownloadedModel(modelName, rowEl) {
+  // Visual confirmation
+  const deleteBtn = rowEl.querySelector(".model-delete-btn");
+  if (deleteBtn.dataset.confirming === "true") {
+    // Second click — confirmed, proceed with deletion
+    deleteBtn.disabled = true;
+    deleteBtn.textContent = "Deleting...";
+    rowEl.classList.add("model-row-deleting");
+    try {
+      await invoke("delete_model", { modelName });
+      // Animate removal
+      rowEl.style.opacity = "0";
+      rowEl.style.transform = "translateX(8px)";
+      rowEl.style.transition = "opacity 200ms ease, transform 200ms ease";
+      setTimeout(() => {
+        rowEl.remove();
+        // Re-render to update total size & empty state
+        renderDownloadedModels();
+        // Refresh main model picker too
+        loadModels();
+      }, 220);
+    } catch (err) {
+      deleteBtn.disabled = false;
+      deleteBtn.textContent = "Delete";
+      deleteBtn.dataset.confirming = "false";
+      deleteBtn.classList.remove("btn-danger-confirm");
+      rowEl.classList.remove("model-row-deleting");
+      const errMsg = document.createElement("span");
+      errMsg.className = "model-delete-error";
+      const errorText = err?.message ?? String(err);
+      errMsg.textContent = `Error: ${errorText}`;
+      rowEl.appendChild(errMsg);
+      setTimeout(() => errMsg.remove(), 3000);
+    }
+  } else {
+    // First click — ask for confirmation in-place
+    deleteBtn.dataset.confirming = "true";
+    deleteBtn.textContent = "Confirm?";
+    deleteBtn.classList.add("btn-danger-confirm");
+    // Auto-reset after 10 s
+    setTimeout(() => {
+      if (deleteBtn.dataset.confirming === "true") {
+        deleteBtn.dataset.confirming = "false";
+        deleteBtn.textContent = "Delete";
+        deleteBtn.classList.remove("btn-danger-confirm");
+      }
+    }, 10000);
+  }
+}
+
+function formatFileSize(bytes) {
+  if (bytes >= 1024 * 1024 * 1024) {
+    return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+  } else if (bytes >= 1024 * 1024) {
+    return `${(bytes / (1024 * 1024)).toFixed(0)} MB`;
+  } else {
+    return `${(bytes / 1024).toFixed(0)} KB`;
+  }
+}
+
+// Render models when navigating to Settings page
+navItems.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    if (btn.dataset.page === "settings") {
+      renderDownloadedModels();
+    }
+  });
+});
+
+document.getElementById("open-models-dir-btn")?.addEventListener("click", async () => {
+  try {
+    await invoke("open_models_dir");
+  } catch (err) {
+    console.error("Failed to open models directory:", err);
+  }
+});
 
 // ---- Update Check ---------------------------------------------------------
 
@@ -540,18 +678,18 @@ async function checkForUpdates() {
   checkUpdateBtn.disabled = true;
   checkUpdateBtn.textContent = "Checking...";
   updateStatus.classList.add("hidden");
-  
+
   try {
     const response = await fetch("https://api.github.com/repos/kylethedeveloper/OratioText/releases/latest");
     if (!response.ok) throw new Error("Failed to check for updates");
     const data = await response.json();
-    
+
     // Tag names typically have a 'v' prefix, e.g. 'v1.0.1'. Clean it up easily:
     const latestVersion = data.tag_name.replace(/^v/, '');
     const currentVersion = await invoke("get_app_version");
-    
+
     const isNewer = compareVersions(latestVersion, currentVersion) > 0;
-    
+
     updateStatus.classList.remove("hidden");
     if (isNewer) {
       updateStatus.textContent = "⚠ Newer version available!";

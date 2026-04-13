@@ -191,6 +191,24 @@
           </div>
         </div>
       </section>
+
+      <section class="card models-manager-card">
+        <div class="models-manager-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <label class="section-label" style="margin-bottom: 0;">Downloaded Models</label>
+            <button id="open-models-dir-btn" class="btn btn-secondary btn-sm" style="padding: 2px 6px; display: flex; align-items: center; justify-content: center;" title="Open models directory in file manager" aria-label="Open models directory in file manager">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-folder-open">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M5 19l2.757 -7.351a1 1 0 0 1 .936 -.649h12.307a1 1 0 0 1 .986 1.164l-.996 5.211a2 2 0 0 1 -1.964 1.625h-14.026a2 2 0 0 1 -2 -2v-11a2 2 0 0 1 2 -2h4l2 2h5a2 2 0 0 1 2 2v1" />
+              </svg>
+            </button>
+          </div>
+          <span id="models-total-size" class="models-total-size"></span>
+        </div>
+        <div id="downloaded-models-list" class="downloaded-models-list">
+          <p class="placeholder-text" id="models-loading-text">Loading...</p>
+        </div>
+      </section>
     </main>
 
     <main class="app-main hidden" id="page-about">
